@@ -4,10 +4,9 @@ function DIFF  = calc_up_down_migration_prob_model(phi_ref, Da)
 fprintf('phi = %1.3f\n', phi_ref);
 
 %% parameters
-K_M = 1;
-K = 0.1;
+K = 10;
 Pe_c = 300;
-M = K/K_M;
+M = 1*K;
 T = 10;
 U_c = 0.003;
 
@@ -19,7 +18,7 @@ N_x = 1000;
 x = linspace(-x_max, x_max, N_x)';
 dx = x(2) - x(1);
 
-dt = 0.5*dx/U_c;
+dt = 0.1*dx/U_c;
 t = 0:dt:100;
 
 D_1 = (-0.5*diag(ones(1,N_x-1), -1) + 0.5*diag(ones(1,N_x-1), 1))/dx;
@@ -65,7 +64,7 @@ for ii = 1:length(t)-1
 
     s_p = -K*phi_p.^2./(1-phi_p).^4 + M*D_1*c_p;
     F_p = (exp(-2*s_p).*s_p + exp(-2*s_p) + s_p - 1)./(s_p.*(1 - exp(-2*s_p)));
-    F_p(s_p < 1e-4) = 1/3*s_p(s_p < 1e-4);  % limit - prevent singularity
+    F_p(abs(s_p) < 1e-4) = 1/3*s_p(abs(s_p) < 1e-4);  % limit - prevent singularity
 
     Eq_Mat = [I/dt - 1/Pe_c*D_2, D_1 
               -U_c/T*diag(F_p) , I*(1/dt + 1/T) - 1/Pe_c*D_2];
@@ -103,6 +102,7 @@ end
 DIFF = N_diff(end);
 
 fprintf('N_diff = %1.9f\n', DIFF);
+
 
 end
 
